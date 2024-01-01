@@ -168,11 +168,15 @@ void Plugin::gameloop(const decltype(hook_gameloop)& hook) {
 
         rakhook::on_receive_rpc += std::bind(&Plugin::on_receive_rpc, this, _1, _2);
         rakhook::on_receive_packet += std::bind(&Plugin::on_receive_packet, this, _1);
-        
+
+
         samp::RefInputBox()->AddCommand("prmenu", [](const char* p) {
             
             GUI->menu_open = !GUI->menu_open;
         });
+
+
+        samp::RefChat()->AddMessage(-1, std::string("{6959ba}[PR Menu]{ffffff} Загружен! Автор плагина : {6959ba}waparabka").c_str());
         
         inited = true;
     }
