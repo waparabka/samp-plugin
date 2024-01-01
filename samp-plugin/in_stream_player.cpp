@@ -39,6 +39,10 @@ InStreamPlayer::world_player_add_s InStreamPlayer::get_updated(uint16_t player_i
 		if (it->player_id == player_id) {
 
 			updated = *it;
+
+			if (position.x == 0 && position.y == 0 && position.z == 0)
+				break;
+			
 			updated.x = position.x; updated.y = position.y; updated.z = position.z;
 
 			break;

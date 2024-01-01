@@ -1,4 +1,5 @@
 #include "plugin.h"
+#include <sampapi/sampapi.h>
 #include <sampapi/CChat.h>
 #include <sampapi/CInput.h>
 #include <sampapi/CGame.h>
@@ -64,9 +65,9 @@ bool Plugin::on_receive_packet(Packet* packet) {
     return true;
 }
 
-
+int test = 0;
 void Plugin::gameloop(const decltype(hook_gameloop)& hook) {
-    
+
     static bool inited = false;
     
     if (!inited && samp::RefChat() != nullptr && rakhook::initialize()) {
