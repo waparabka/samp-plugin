@@ -5,6 +5,7 @@
 #include <RakNet/BitStream.h>
 #include <RakNet/PacketEnumerations.h>
 #include "plugin_render.h"
+#include "in_stream_player.h"
 
 using gameloop_t = void(__cdecl*)();
 
@@ -18,6 +19,7 @@ public:
 private:
 	bool inited;
 	PluginRender render;
+	InStreamPlayer stream_players;
 	
 	kthook::kthook_simple<gameloop_t> hook_gameloop { reinterpret_cast<void*>(0x561B10) };
 	void gameloop(const decltype(hook_gameloop)& hook);
@@ -41,17 +43,4 @@ private:
 
 	bool on_receive_rpc(unsigned char& id, RakNet::BitStream* bs);
 	bool on_receive_packet(Packet* packet);
-	
-
-	struct world_player_add_s {
-		uint16_t playerid;
-		uint8_t team;
-		uint32_t skinid;
-		float x, y, z, fa;
-		uint32_t color;
-		uint8_t fstyle;
-		uint16_t skill;
-	};
-
-	std::vector<world_player_add_s> in_stream_players{ };
 };

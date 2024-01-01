@@ -23,6 +23,8 @@ private:
 	kthook::kthook_signal<reset_t> reset_hook { };
 	kthook::kthook_simple<wnd_proc_t> wnd_proc_hook { };
 	
+	uintptr_t find_device(uint32_t length);
+	void* get_function_address(int virtual_table_index);
 	std::optional<HRESULT> d3d9_present(const decltype(present_hook)& hook, IDirect3DDevice9* device, CONST RECT* src_rect, CONST RECT* dest_rect, HWND dest_window, CONST RGNDATA* dirty_region);
 	std::optional<HRESULT> d3d9_lost(const decltype(reset_hook)& hook, LPDIRECT3DDEVICE9 device, D3DPRESENT_PARAMETERS* present_params);
 	void d3d9_reset(const decltype(reset_hook)& hook, HRESULT& return_value, IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* params);
@@ -30,8 +32,6 @@ private:
 	
 public:
 	PluginGUI GUI;
-	
-	void setup_d3d9_hooks();
 
 	PluginRender();
 	~PluginRender();

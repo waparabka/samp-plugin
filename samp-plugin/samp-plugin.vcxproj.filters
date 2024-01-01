@@ -23,6 +23,7 @@
     <ClCompile Include="rakhook\RakNet\PluginInterface.cpp" />
     <ClCompile Include="rakhook\RakNet\StringCompressor.cpp" />
     <ClCompile Include="imgui\imgui_toggle_button.cpp" />
+    <ClCompile Include="in_stream_player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="plugin.h" />
@@ -319,5 +320,6 @@
     <ClInclude Include="rakhook\RakNet\StringCompressor.h" />
     <ClInclude Include="nlohmann\json.hpp" />
     <ClInclude Include="nlohmann\json_fwd.hpp" />
+    <ClInclude Include="in_stream_player.h" />
   </ItemGroup>
 </Project>

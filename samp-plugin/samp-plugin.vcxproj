@@ -153,6 +153,7 @@
     <ClCompile Include="kthook\hde\hde32.c" />
     <ClCompile Include="kthook\hde\hde64.c" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="in_stream_player.cpp" />
     <ClCompile Include="plugin.cpp" />
     <ClCompile Include="plugin_gui.cpp" />
     <ClCompile Include="plugin_render.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="kthook\xbyak\xbyak_util.h" />
     <ClInclude Include="nlohmann\json.hpp" />
     <ClInclude Include="nlohmann\json_fwd.hpp" />
+    <ClInclude Include="in_stream_player.h" />
     <ClInclude Include="plugin.h" />
     <ClInclude Include="plugin_gui.h" />
     <ClInclude Include="plugin_render.h" />
