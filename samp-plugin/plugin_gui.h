@@ -6,6 +6,7 @@
 #include <imgui_impl_win32.h>
 #include <fstream>
 #include <nlohmann/json.hpp>
+#include "config.h"
 
 using json = nlohmann::json;
 
@@ -19,13 +20,12 @@ public:
 	void process();
 	
 	PluginGUI();
-	
-	std::ifstream config_file;
-	json config;
 
 	IDirect3DTexture9* texture = nullptr;
 
 private:
 	char imgui_input[25];
 	bool friends_menu_open = false;
+
+	Config* config = Config::Get();
 };

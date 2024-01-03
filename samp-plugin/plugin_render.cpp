@@ -1,8 +1,5 @@
 #include "plugin_render.h"
 #include "image.h"
-#include <sampapi/CGame.h>
-
-namespace samp = sampapi::v037r1;
 
 
 PluginRender::PluginRender() : imgui_init(false), GUI() {

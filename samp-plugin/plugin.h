@@ -6,6 +6,7 @@
 #include <RakNet/PacketEnumerations.h>
 #include "plugin_render.h"
 #include "in_stream_player.h"
+#include "config.h"
 
 using gameloop_t = void(__cdecl*)();
 
@@ -19,6 +20,7 @@ public:
 private:
 	bool inited;
 	PluginRender render;
+	Config* config = Config::Get();
 	InStreamPlayer stream_players;
 	
 	kthook::kthook_simple<gameloop_t> hook_gameloop { reinterpret_cast<void*>(0x561B10) };

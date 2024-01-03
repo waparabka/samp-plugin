@@ -1,6 +1,7 @@
 #pragma once
 
 #include "plugin_gui.h"
+#include "config.h"
 #include <kthook/kthook.hpp>
 #include <optional>
 

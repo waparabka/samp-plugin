@@ -12,7 +12,6 @@
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="kthook\hde\hde32.c" />
     <ClCompile Include="kthook\hde\hde64.c" />
-    <ClCompile Include="sampapi\src\sampapi\sampapi.cpp" />
     <ClCompile Include="plugin_render.cpp" />
     <ClCompile Include="plugin_gui.cpp" />
     <ClCompile Include="rakhook\RakHook\offsets.cpp" />
@@ -24,6 +23,7 @@
     <ClCompile Include="rakhook\RakNet\StringCompressor.cpp" />
     <ClCompile Include="imgui\imgui_toggle_button.cpp" />
     <ClCompile Include="in_stream_player.cpp" />
+    <ClCompile Include="sampapi\src\sampapi\sampapi.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="plugin.h" />
@@ -295,7 +295,6 @@
     <ClInclude Include="sampapi\include\SpecialAction.h" />
     <ClInclude Include="sampapi\include\Synchronization.h" />
     <ClInclude Include="sampapi\include\VehicleSelection.h" />
-    <ClInclude Include="sampapi\include\sampapi\sampapi.h" />
     <ClInclude Include="image.h" />
     <ClInclude Include="plugin_render.h" />
     <ClInclude Include="plugin_gui.h" />
@@ -321,5 +320,7 @@
     <ClInclude Include="nlohmann\json.hpp" />
     <ClInclude Include="nlohmann\json_fwd.hpp" />
     <ClInclude Include="in_stream_player.h" />
+    <ClInclude Include="samp_version.h" />
+    <ClInclude Include="sampapi\include\sampapi\sampapi.h" />
   </ItemGroup>
 </Project>

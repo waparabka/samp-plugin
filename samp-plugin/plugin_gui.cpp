@@ -1,8 +1,4 @@
 #include "plugin_gui.h"
-#include <sampapi/CChat.h>
-#include <sampapi/CNetGame.h>
-
-namespace samp = sampapi::v037r1;
 
 
 PluginGUI::PluginGUI() : menu_open(false) { }
@@ -89,66 +85,6 @@ void PluginGUI::init() {
     style.Colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.196078434586525f, 0.1764705926179886f, 0.5450980663299561f, 0.501960813999176f);
     style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.196078434586525f, 0.1764705926179886f, 0.5450980663299561f, 0.501960813999176f);
     
-    
-    config_file.open("prmenu.json");
-    
-    if (!config_file.is_open() || config_file.peek() == std::ifstream::traits_type::eof()) {
-
-        if (config["fractions"]["grove"]["color"].is_null())
-            config["fractions"]["grove"]["color"] = "FF009F00";
-
-        if (config["fractions"]["ballas"]["color"].is_null())
-            config["fractions"]["ballas"]["color"] = "FFB313E7";
-
-        if (config["fractions"]["rifa"]["color"].is_null())
-            config["fractions"]["rifa"]["color"] = "FF2A9170";
-
-        if (config["fractions"]["aztec"]["color"].is_null())
-            config["fractions"]["aztec"]["color"] = "FF01FCFF";
-
-        if (config["fractions"]["vagos"]["color"].is_null())
-            config["fractions"]["vagos"]["color"] = "FFFFDE24";
-
-        if (config["fractions"]["lcn"]["color"].is_null())
-            config["fractions"]["lcn"]["color"] = "FFDDA701";
-
-        if (config["fractions"]["yakuza"]["color"].is_null())
-            config["fractions"]["yakuza"]["color"] = "FFFF0000";
-
-        if (config["fractions"]["rm"]["color"].is_null())
-            config["fractions"]["rm"]["color"] = "FF114D71";
-        
-        if (config["fractions"]["civil"]["color"].is_null())
-            config["fractions"]["civil"]["color"] = "FFFFFFFF";
-
-        if (config["bobcats"]["bobcat"].is_null())
-            config["bobcats"]["bobcat"] = 422;
-
-        if (config["bobcats"]["yosemite"].is_null())
-            config["bobcats"]["yosemite"] = 554;
-
-        if (config["bobcats"]["picador"].is_null())
-            config["bobcats"]["picador"] = 600;
-        
-        
-        for (const auto& [key, val] : config["fractions"].items())
-            config["config"]["fractions"][key]["state"] = false;
-
-        config["config"]["misc"]["not_delete_incar_players"]["state"] = false;
-        config["config"]["misc"]["not_delete_bobcat_players"]["state"] = false;
-        config["config"]["misc"]["enable_friend_list"]["state"] = false;
-        config["config"]["misc"]["delete_friends_tracers"]["state"] = false;
- 
-        config_file.close();
-
-        
-        std::ofstream f("prmenu.json");
-        f << config;
-    }
-    else {
-
-        config = json::parse(config_file);
-    }
 
     memset(imgui_input, '\0', sizeof(imgui_input));
 }
@@ -162,8 +98,8 @@ void PluginGUI::process() {
     static bool main_window_inited = false;
 
     ImVec2 window_pos;
-    float width = 640, height = 420;
-
+    float width = 640, height = 500;
+    
     auto window_size = ImGui::GetIO().DisplaySize;
     auto window_center = ImVec2(window_size.x / 2 - width / 2, window_size.y / 2 - height / 2);
 
@@ -171,7 +107,7 @@ void PluginGUI::process() {
 
         ImGui::SetCursorScreenPos(window_center);
         ImGui::SetNextWindowPos(window_center);
-        ImGui::SetNextWindowSize(ImVec2(640, 480));
+        ImGui::SetNextWindowSize(ImVec2(width, height));
 
         main_window_inited = true;
     }
@@ -207,7 +143,7 @@ void PluginGUI::process() {
 
         float initial_y_offset = ImGui::GetCursorPos().y;
 
-        for (const auto& [key, val] : config["fractions"].items()) {
+        for (const auto& [key, val] : config->config["fractions"].items()) {
 
             ImU32 color;
 
@@ -230,7 +166,9 @@ void PluginGUI::process() {
 
             ImGui::SetCursorPosX(button_offset);
             
-            ImGui::ToggleButton(key.c_str(), &config["config"]["fractions"][key]["state"].get_ref<bool&>());
+            ImGui::ToggleButton(key.c_str(), &config->config["config"]["fractions"][key]["state"].get_ref<bool&>());
+            if (ImGui::IsItemClicked())
+                config->toggled = true;
             
             i++;
 
@@ -247,14 +185,20 @@ void PluginGUI::process() {
         ImGui::Spacing();
         ImGui::Separator();
         ImGui::Spacing();
+        
+        ImGui::Text(reinterpret_cast<const char*>(u8"Не удалять маркеры игроков на радаре"));
+        ImGui::SameLine();
+        ImGui::ToggleButton("not_delete_markers", &config->config["config"]["misc"]["not_delete_markers"]["state"].get_ref<bool&>());
+        if (ImGui::IsItemClicked())
+            config->toggled = true;
 
         ImGui::Text(reinterpret_cast<const char*>(u8"Не удалять игроков в машинах"));
         ImGui::SameLine();
-        ImGui::ToggleButton("not_delete_incar_players", &config["config"]["misc"]["not_delete_incar_players"]["state"].get_ref<bool&>());
+        ImGui::ToggleButton("not_delete_incar_players", &config->config["config"]["misc"]["not_delete_incar_players"]["state"].get_ref<bool&>());
         
         ImGui::Text(reinterpret_cast<const char*>(u8"Не удалять игроков в мясовозках"));
         ImGui::SameLine();
-        ImGui::ToggleButton("not_delete_bobcat_players", &config["config"]["misc"]["not_delete_bobcat_players"]["state"].get_ref<bool&>());
+        ImGui::ToggleButton("not_delete_bobcat_players", &config->config["config"]["misc"]["not_delete_bobcat_players"]["state"].get_ref<bool&>());
 
         ImGui::Spacing();
         ImGui::Separator();
@@ -262,10 +206,10 @@ void PluginGUI::process() {
 
         ImGui::Text(reinterpret_cast<const char*>(u8"Включить френд лист"));
         ImGui::SameLine();
-        ImGui::ToggleButton("enable_friend_list", &config["config"]["misc"]["enable_friend_list"]["state"].get_ref<bool&>());
+        ImGui::ToggleButton("enable_friend_list", &config->config["config"]["misc"]["enable_friend_list"]["state"].get_ref<bool&>());
 
 
-        if (config["config"]["misc"]["enable_friend_list"]["state"].get<bool>()) {
+        if (config->config["config"]["misc"]["enable_friend_list"]["state"].get<bool>()) {
 
             ImGui::Spacing();
             
@@ -297,7 +241,7 @@ void PluginGUI::process() {
                     }
                     
                     
-                    for (auto const& [key, val] : config["friends"].items()) {
+                    for (auto const& [key, val] : config->config["friends"].items()) {
 
                         if (key.c_str() == name) {
 
@@ -310,7 +254,7 @@ void PluginGUI::process() {
 
                     samp::RefChat()->AddMessage(-1, std::string("{6959ba}[PR Menu]{ffffff} Игрок " + std::string(imgui_input) + " добавлен в список друзей").c_str());
                     
-                    config["friends"][imgui_input] = 1;
+                    config->config["friends"][imgui_input] = 1;
                     memset(imgui_input, '\0', sizeof(imgui_input));
 
                     std::ofstream f("prmenu.json");
@@ -346,13 +290,13 @@ void PluginGUI::process() {
                         strncpy(imgui_input, name.c_str(), name.size());
                     }
 
-                    for (auto const& [key, val] : config["friends"].items()) {
+                    for (auto const& [key, val] : config->config["friends"].items()) {
 
                         if (key.c_str() == name) {
 
                             samp::RefChat()->AddMessage(-1, std::string("{6959ba}[PR Menu]{ffffff} Игрок " + std::string(imgui_input) + " удален из списка друзей").c_str());
 
-                            config["friends"].erase(name);
+                            config->config["friends"].erase(name);
                             memset(imgui_input, '\0', sizeof(imgui_input));
 
                             std::ofstream f("prmenu.json");
@@ -382,7 +326,7 @@ void PluginGUI::process() {
 
             ImGui::Text(reinterpret_cast<const char*>(u8"Удалять трасеры друзей"));
             ImGui::SameLine();
-            ImGui::ToggleButton("delete_friends_tracers", &config["config"]["misc"]["delete_friends_tracers"]["state"].get_ref<bool&>());
+            ImGui::ToggleButton("delete_friends_tracers", &config->config["config"]["misc"]["delete_friends_tracers"]["state"].get_ref<bool&>());
             
 
             if (friends_menu_open) {
@@ -396,7 +340,7 @@ void PluginGUI::process() {
 
                 if (ImGui::Begin(reinterpret_cast<const char*>(u8"PR Menu | Друзья"), &friends_menu_open, ImGuiWindowFlags_UnsavedDocument | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_None | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)) {
                     
-                    for (auto const& [key, val] : config["friends"].items())
+                    for (auto const& [key, val] : config->config["friends"].items())
                         ImGui::Text(key.c_str());
                 }
             }
