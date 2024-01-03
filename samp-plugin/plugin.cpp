@@ -25,7 +25,7 @@ bool Plugin::on_receive_rpc(unsigned char& id, RakNet::BitStream* bs) {
     }
 
     if (id == 163) {
-        
+
         uint16_t player_id;
         bs->Read(player_id);
 
@@ -39,7 +39,7 @@ bool Plugin::on_receive_rpc(unsigned char& id, RakNet::BitStream* bs) {
 bool Plugin::on_receive_packet(Packet* packet) {
     
     RakNet::BitStream bs(packet->data, packet->length, false);
-
+    
     uint8_t packet_id;
     bs.Read(packet_id);
 
@@ -49,9 +49,16 @@ bool Plugin::on_receive_packet(Packet* packet) {
         samp::RefChat()->AddMessage(-1, std::string("{6959ba}[PR Menu]{ffffff} Загружен! Автор плагина : {6959ba}waparabka").c_str());
     }
 
+
     if (packet_id == PacketEnumeration::ID_BULLET_SYNC) {
         
-        if (!config->config["config"]["misc"]["delete_friends_tracers"]["state"].get<bool>())
+        if (!config->config["config"]["misc"]["enable_friend_list"]["state"].get<bool>() || !config->config["config"]["misc"]["delete_friends_tracers"]["state"].get<bool>())
+            return true;
+
+        uint16_t player_id;
+        bs.Read(player_id);
+        
+        if (!stream_players.is_contains(player_id))
             return true;
 
         samp::Synchronization::BulletData data = { 0 };
@@ -60,6 +67,26 @@ bool Plugin::on_receive_packet(Packet* packet) {
 
         if (data.m_nTargetId == samp::RefNetGame()->GetPlayerPool()->m_localInfo.m_nId)
             return false;
+    }
+
+
+    if (packet_id == PacketEnumeration::ID_VEHICLE_SYNC) {
+        
+        if (!config->config["config"]["misc"]["not_delete_incar_players"]["state"].get<bool>() && config->config["config"]["misc"]["not_delete_bobcat_players"]["state"].get<bool>())
+            return true;
+
+        uint16_t player_id;
+        bs.Read(player_id);
+
+        if (!stream_players.is_contains(player_id))
+            return true;
+        
+        auto player = samp::RefNetGame()->GetPlayerPool()->GetPlayer(player_id);
+        
+        if (player->DoesExist())
+            return true;
+
+        stream_players.create(stream_players.get_updated(player_id, player->m_onfootData.m_position));
     }
 
     return true;
@@ -73,7 +100,7 @@ void Plugin::gameloop(const decltype(hook_gameloop)& hook) {
     if (!inited && samp::RefChat() != nullptr && rakhook::initialize()) {
         
         using namespace std::placeholders;
-        
+
         GUI = &render.GUI;
 
         rakhook::on_receive_rpc += std::bind(&Plugin::on_receive_rpc, this, _1, _2);

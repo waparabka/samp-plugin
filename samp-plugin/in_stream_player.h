@@ -19,7 +19,6 @@ public:
 		float x, y, z, fa;
 		uint32_t color;
 		uint8_t fstyle;
-		uint16_t skill;
 	};
 
 	bool is_contains(uint16_t player_id);

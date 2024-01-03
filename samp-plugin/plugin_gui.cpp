@@ -336,7 +336,7 @@ void PluginGUI::process() {
                 friend_list_window_pos.x += width + 15;
 
                 ImGui::SetNextWindowPos(friend_list_window_pos);
-                ImGui::SetNextWindowSize(ImVec2(180, 480));
+                ImGui::SetNextWindowSize(ImVec2(180, height));
 
                 if (ImGui::Begin(reinterpret_cast<const char*>(u8"PR Menu | Äðóçüÿ"), &friends_menu_open, ImGuiWindowFlags_UnsavedDocument | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_None | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)) {
                     

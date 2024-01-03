@@ -45,6 +45,9 @@ void InStreamPlayer::create(world_player_add_s world_player) {
     RakNet::BitStream bs { };
     
     bs.Write((char*)&world_player, sizeof(world_player_add_s));
+    
+    for (int i = 0; i < 10; i++)
+        bs.Write<uint16_t>(999);
 
     rakhook::emul_rpc(32, bs);
 }

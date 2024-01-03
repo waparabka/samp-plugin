@@ -3,12 +3,16 @@
 
 Config::Config() {
 
-    config_file.open("prmenu.json");
+    try {
 
-    if (!config_file.is_open() || config_file.peek() == std::ifstream::traits_type::eof()) {
+        config_file.open("prmenu.json");
+        
+        config = json::parse(config_file);
+    }
+    catch (json::parse_error& ex) {
 
         // generate config fields
-
+        
         if (config["fractions"]["grove"]["color"].is_null())
             config["fractions"]["grove"]["color"] = "FF009F00";
 
@@ -44,17 +48,15 @@ Config::Config() {
 
         if (config["bobcats"]["picador"].is_null())
             config["bobcats"]["picador"] = 600;
-        
-        
-        config_file.close();
-        
+
+
         std::ofstream f("prmenu.json");
         f << config;
     }
-    else
-        config = json::parse(config_file);
 
+    config_file.close();
     
+
     // non-generate config fields
     
     if (config["fractions"]["all"]["color"].is_null())

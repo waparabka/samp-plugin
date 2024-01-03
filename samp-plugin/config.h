@@ -9,7 +9,7 @@
 #include <sampapi/CNetGame.h>
 #include <sampapi/sampapi.h>
 
-namespace samp = sampapi::v037r1;
+namespace samp = sampapi::v037r5;
 
 using json = nlohmann::json;
 
