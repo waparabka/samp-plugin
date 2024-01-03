@@ -68,6 +68,7 @@ Config::Config() {
     config["config"]["misc"]["not_delete_markers"]["state"] = false;
     config["config"]["misc"]["not_delete_incar_players"]["state"] = false;
     config["config"]["misc"]["not_delete_bobcat_players"]["state"] = false;
+    config["config"]["misc"]["instant_delete_dead_players"]["state"] = false;
     config["config"]["misc"]["enable_friend_list"]["state"] = false;
     config["config"]["misc"]["delete_friends_tracers"]["state"] = false;
 }
