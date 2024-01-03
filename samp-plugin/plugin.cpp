@@ -18,7 +18,7 @@ bool Plugin::on_receive_rpc(unsigned char& id, RakNet::BitStream* bs) {
 
         InStreamPlayer::world_player_add_s in_stream_player = { 0 };
         bs->Read((char*)&in_stream_player, sizeof(InStreamPlayer::world_player_add_s));
-        
+
         stream_players.add(in_stream_player);
 
         return false;
@@ -79,12 +79,11 @@ void Plugin::gameloop(const decltype(hook_gameloop)& hook) {
         rakhook::on_receive_rpc += std::bind(&Plugin::on_receive_rpc, this, _1, _2);
         rakhook::on_receive_packet += std::bind(&Plugin::on_receive_packet, this, _1);
 
-
         samp::RefInputBox()->AddCommand("prmenu", [](const char* p) {
             
             GUI->menu_open = !GUI->menu_open;
         });
-        
+
         inited = true;
     }
     else if (inited) {

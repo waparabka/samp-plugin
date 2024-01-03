@@ -121,6 +121,17 @@ bool InStreamPlayer::should_be_deleted(uint16_t player_id) { // TODO : add skin'
 }
 
 
+bool InStreamPlayer::is_afk(uint16_t player_id) {
+
+    auto player = samp::RefNetGame()->GetPlayerPool()->GetPlayer(player_id);
+
+    if (!player)
+        return true;
+
+    return (player->m_lastUpdate < GetTickCount() - 2500);
+}
+
+
 void InStreamPlayer::process() {
 
     for (auto it = begin(); it != end(); it++) {
@@ -143,6 +154,9 @@ void InStreamPlayer::process() {
         if (config->config["config"]["misc"]["not_delete_markers"]["state"].get<bool>()) {
             
             if (player->DoesExist())
+                continue;
+
+            if (is_afk(*it))
                 continue;
 
             auto position = player->m_onfootData.m_position;
