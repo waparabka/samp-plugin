@@ -47,6 +47,8 @@ bool Plugin::on_receive_packet(Packet* packet) {
     if (packet_id == PacketEnumeration::ID_CONNECTION_REQUEST_ACCEPTED) {
         
         samp::RefChat()->AddMessage(-1, std::string("{6959ba}[PR Menu]{ffffff} Загружен! Автор плагина : {6959ba}waparabka").c_str());
+
+        stream_players.clear();
     }
 
 
@@ -89,8 +91,9 @@ bool Plugin::on_receive_packet(Packet* packet) {
         
         if (player->DoesExist())
             return true;
-
-        stream_players.create(stream_players.get_updated(player_id, player->m_onfootData.m_position));
+        
+        if (!stream_players.should_be_deleted(player_id))
+            stream_players.create(stream_players.get_updated(player_id, player->m_onfootData.m_position));
     }
 
     return true;

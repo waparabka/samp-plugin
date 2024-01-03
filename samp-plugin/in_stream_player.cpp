@@ -53,6 +53,13 @@ void InStreamPlayer::create(world_player_add_s world_player) {
 }
 
 
+void InStreamPlayer::clear() {
+
+    players.clear();
+    players_iterator.clear();
+}
+
+
 bool InStreamPlayer::should_be_deleted(uint16_t player_id) { // TODO : add skin's condition
 
     auto player = samp::RefNetGame()->GetPlayerPool()->GetPlayer(player_id);
@@ -67,8 +74,8 @@ bool InStreamPlayer::should_be_deleted(uint16_t player_id) { // TODO : add skin'
             
             if (config->config["config"]["fractions"]["all"]["state"].get<bool>())
                 return true;
-
             
+
             if (config->config["config"]["misc"]["not_delete_incar_players"]["state"].get<bool>()) {
 
                 auto vehicle = player->m_pVehicle;
@@ -143,10 +150,10 @@ void InStreamPlayer::process() {
 
         if (!player)
             continue;
-
+        
         bool should_be_deleted = this->should_be_deleted(*it);
         
-        if (should_be_deleted && player->DoesExist()) {
+        if (should_be_deleted && player->DoesExist() ) {
             player->Remove();
         }
         else if (config->toggled && !player->DoesExist()) {

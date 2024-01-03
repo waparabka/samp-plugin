@@ -25,6 +25,7 @@ public:
 	void add(world_player_add_s world_player);
 	void remove(uint16_t player_id);
 	void create(world_player_add_s world_player);
+	void clear();
 	bool should_be_deleted(uint16_t player_id);
 	bool is_afk(uint16_t player_id);
 	void process();
