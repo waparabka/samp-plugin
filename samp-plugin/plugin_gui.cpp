@@ -98,7 +98,7 @@ void PluginGUI::process() {
     static bool main_window_inited = false;
 
     ImVec2 window_pos;
-    float width = 640, height = 500;
+    float width = 640, height = 520;
     
     auto window_size = ImGui::GetIO().DisplaySize;
     auto window_center = ImVec2(window_size.x / 2 - width / 2, window_size.y / 2 - height / 2);
@@ -199,6 +199,12 @@ void PluginGUI::process() {
         ImGui::Text(reinterpret_cast<const char*>(u8"Не удалять игроков в мясовозках"));
         ImGui::SameLine();
         ImGui::ToggleButton("not_delete_bobcat_players", &config->config["config"]["misc"]["not_delete_bobcat_players"]["state"].get_ref<bool&>());
+        
+        /*ImGui::Text(reinterpret_cast<const char*>(u8"Мгновенно удалять мертвых игроков"));
+        ImGui::SameLine();
+        ImGui::ToggleButton("instant_delete_dead_players", &config->config["config"]["misc"]["instant_delete_dead_players"]["state"].get_ref<bool&>());
+        if (ImGui::IsItemClicked())
+            config->toggled = true;*/
 
         ImGui::Spacing();
         ImGui::Separator();
