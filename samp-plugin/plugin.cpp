@@ -72,7 +72,11 @@ bool Plugin::on_receive_packet(Packet* packet) {
 
     if (packet_id == PacketEnumeration::ID_VEHICLE_SYNC) {
         
-        if (!config->config["config"]["misc"]["not_delete_incar_players"]["state"].get<bool>() && config->config["config"]["misc"]["not_delete_bobcat_players"]["state"].get<bool>())
+        if (config->config["config"]["fractions"]["all"]["state"].get<bool>())
+            return true;
+
+
+        if (!config->config["config"]["misc"]["not_delete_incar_players"]["state"].get<bool>() && !config->config["config"]["misc"]["not_delete_bobcat_players"]["state"].get<bool>())
             return true;
 
         uint16_t player_id;
