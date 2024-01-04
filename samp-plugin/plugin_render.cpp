@@ -74,8 +74,8 @@ uintptr_t PluginRender::find_device(uint32_t length) {
 
             return object_base;
         }
-
-        return std::uintptr_t(0);
+        
+        return uintptr_t(0);
 
     }(length);
 
@@ -93,8 +93,6 @@ std::optional<HRESULT> PluginRender::d3d9_present(const decltype(present_hook)& 
 
     if (!imgui_init) {
         
-        D3DXCreateTextureFromFileInMemory(device, &logo, sizeof(logo), &GUI.texture);
-
         ImGui::CreateContext();
         
         ImGui_ImplWin32_Init(game_window_handle);
@@ -103,6 +101,8 @@ std::optional<HRESULT> PluginRender::d3d9_present(const decltype(present_hook)& 
         ImGui::GetIO().IniFilename = nullptr;
         ImGui::GetIO().MouseDrawCursor = false;
         ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+
+        D3DXCreateTextureFromFileInMemory(device, &logo, sizeof(logo), &GUI.texture);
 
 #pragma warning(push)
 #pragma warning(disable: 4996)
@@ -128,7 +128,7 @@ std::optional<HRESULT> PluginRender::d3d9_present(const decltype(present_hook)& 
 
         ImGui_ImplDX9_NewFrame();
         ImGui_ImplWin32_NewFrame();
-
+        
         ImGui::NewFrame();
         
         GUI.process();
@@ -151,10 +151,7 @@ std::optional<HRESULT> PluginRender::d3d9_lost(const decltype(reset_hook)&hook, 
 }
 
 
-void PluginRender::d3d9_reset(const decltype(reset_hook)& hook, HRESULT& return_value, IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* params) {
-
-    ImGui_ImplDX9_InvalidateDeviceObjects();
-}
+void PluginRender::d3d9_reset(const decltype(reset_hook)& hook, HRESULT& return_value, IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* params) { }
 
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param);
