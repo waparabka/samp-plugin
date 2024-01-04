@@ -98,7 +98,7 @@ void PluginGUI::process() {
     static bool main_window_inited = false;
 
     ImVec2 window_pos;
-    float width = 640, height = 520;
+    float width = 640, height = 500;
     
     auto window_size = ImGui::GetIO().DisplaySize;
     auto window_center = ImVec2(window_size.x / 2 - width / 2, window_size.y / 2 - height / 2);
