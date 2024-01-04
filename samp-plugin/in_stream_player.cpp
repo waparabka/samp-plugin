@@ -76,7 +76,7 @@ bool InStreamPlayer::should_be_deleted(uint16_t player_id) { // TODO : add skin'
             
             if (config->config["config"]["fractions"]["all"]["state"].get<bool>())
                 return true;
-            
+
 
             if (config->config["config"]["misc"]["not_delete_incar_players"]["state"].get<bool>()) {
 
@@ -139,8 +139,8 @@ bool InStreamPlayer::is_afk(uint16_t player_id) {
 
     if (!player)
         return true;
-
-    return (player->m_lastUpdate < GetTickCount() - 2500);
+    
+    return (player->m_lastUpdate < GetTickCount() - 1500);
 }
 
 
@@ -159,7 +159,7 @@ void InStreamPlayer::process() {
         
         bool should_be_deleted = this->should_be_deleted(*it);
         
-        if (should_be_deleted && player->DoesExist() ) {
+        if (should_be_deleted && player->DoesExist()) {
             player->Remove();
         }
         else if (config->toggled && !player->DoesExist()) {

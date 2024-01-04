@@ -1,7 +1,6 @@
 #include "plugin.h"
 
 PluginGUI* GUI = nullptr;
-InStreamPlayer* stream_players_;
 
 
 Plugin::Plugin(HMODULE handle) : module_handle(handle), inited(false), render() {
@@ -23,6 +22,7 @@ bool Plugin::on_receive_rpc(unsigned char& id, RakNet::BitStream* bs) {
         stream_players.remove(player_id);
     }
 
+
     if (id == 32) {
 
         InStreamPlayer::world_player_add_s in_stream_player = { 0 };
@@ -33,12 +33,49 @@ bool Plugin::on_receive_rpc(unsigned char& id, RakNet::BitStream* bs) {
         return false;
     }
 
+
     if (id == 163) {
 
         uint16_t player_id;
         bs->Read(player_id);
 
         stream_players.remove(player_id);
+    }
+
+    
+    if (id == 86) {
+        
+        if (!config->config["config"]["misc"]["instant_delete_dead_players"]["state"].get<bool>())
+            return true;
+
+        uint16_t player_id;
+        bs->Read(player_id);
+
+
+        if (!stream_players.is_contains(player_id))
+            return true;
+
+
+        std::string anim_lib = read_with_size<uint8_t>(*bs);
+
+        if (anim_lib != "PED")
+            return true;
+
+
+        auto player = samp::RefNetGame()->GetPlayerPool()->GetPlayer(player_id);
+
+        if (!player && player->DoesExist())
+            return true;
+        
+
+        std::vector<std::string> death_anims = { "KD_right", "KO_shot_face", "KO_shot_front", "KO_shot_stom", "KO_skid_back", "KO_skid_front", "KO_spin_L", "KO_spin_R" };
+
+
+        std::string anim_name = read_with_size<uint8_t>(*bs);
+        
+        for (auto it = death_anims.begin(); it < death_anims.end(); it++)
+            if (*it == anim_name && player->m_onfootData.m_nHealth == 0) {
+                player->Remove(); return true; }
     }
 
     return true;
@@ -137,7 +174,6 @@ void Plugin::gameloop(const decltype(hook_gameloop)& hook) {
         using namespace std::placeholders;
 
         GUI = &render.GUI;
-        stream_players_ = &stream_players;
 
         rakhook::on_receive_rpc += std::bind(&Plugin::on_receive_rpc, this, _1, _2);
         rakhook::on_receive_packet += std::bind(&Plugin::on_receive_packet, this, _1);
