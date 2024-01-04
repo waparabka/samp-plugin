@@ -46,8 +46,10 @@ void InStreamPlayer::create(world_player_add_s world_player) {
     
     bs.Write((char*)&world_player, sizeof(world_player_add_s));
     
-    for (int i = 0; i < 10; i++)
-        bs.Write<uint16_t>(999);
+    uint16_t skill[11] = { };
+    std::fill_n(skill, 11, 1000);
+    
+    bs.Write((char*)&skill, sizeof(skill));
 
     rakhook::emul_rpc(32, bs);
 }
@@ -150,6 +152,10 @@ void InStreamPlayer::process() {
 
         if (!player)
             continue;
+
+        if (!is_afk(*it))
+            update(*it);
+
         
         bool should_be_deleted = this->should_be_deleted(*it);
         
@@ -157,7 +163,7 @@ void InStreamPlayer::process() {
             player->Remove();
         }
         else if (config->toggled && !player->DoesExist()) {
-            create(get_updated(*it, player->m_onfootData.m_position));
+            create(get(*it));
         }
         
         
@@ -166,23 +172,9 @@ void InStreamPlayer::process() {
             if (player->DoesExist())
                 continue;
 
-            if (is_afk(*it))
-                continue;
-
-            auto position = player->m_onfootData.m_position;
+            auto world_player = get(*it);
             
-            if (position.GetLength() == 0) {
-
-                auto world_player = get(*it);
-                auto world_player_position = sampapi::CVector(world_player.x, world_player.y, world_player.z);
-                
-                if (std::isinf(world_player_position.GetLength()))
-                    continue;
-
-                position = world_player_position;
-            }
-            
-            player->SetMarkerPosition(position.x, position.y, position.z);
+            player->SetMarkerPosition(world_player.x, world_player.y, world_player.z);
         }
         else if (config->toggled) {
             player->SetMarkerState(0);
@@ -194,36 +186,48 @@ void InStreamPlayer::process() {
 }
 
 
-InStreamPlayer::world_player_add_s InStreamPlayer::get_updated(uint16_t player_id, sampapi::CVector position) {
-	
-	world_player_add_s updated { };
+InStreamPlayer::world_player_add_s InStreamPlayer::get(uint16_t player_id) {
 
+    for (auto it = players.begin(); it != players.end(); it++)
+        if (it->player_id == player_id)
+            return *it;
+
+    return { 0 };
+}
+
+
+void InStreamPlayer::update(uint16_t player_id) {
+
+    auto player = samp::RefNetGame()->GetPlayerPool()->GetPlayer(player_id);
+
+    if (!player)
+        return;
+
+	
 	for (auto it = players.begin(); it != players.end(); it++) {
 
 		if (it->player_id == player_id) {
+            
+            sampapi::CVector position = { };
 
-			updated = *it;
+            if (player->m_pVehicle)
+                position = player->m_incarData.m_position;
+            else if (player->m_nSeatId > 0)
+                position = player->m_passengerData.m_position;
+            else
+                position = player->m_onfootData.m_position;
+            
 
-			if (position.x == 0 && position.y == 0 && position.z == 0)
-				break;
-			
+            world_player_add_s updated = *it;
+            
 			updated.x = position.x; updated.y = position.y; updated.z = position.z;
+
+            players.erase(it);
+            players.push_back(updated);
 
 			break;
 		}
 	}
-	
-	return updated;
-}
-
-
-InStreamPlayer::world_player_add_s InStreamPlayer::get(uint16_t player_id) {
-    
-    for (auto it = players.begin(); it != players.end(); it++)
-        if (it->player_id == player_id)
-            return *it;
-    
-    return { 0 };
 }
 
 

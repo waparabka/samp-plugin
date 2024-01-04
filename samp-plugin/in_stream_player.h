@@ -29,8 +29,8 @@ public:
 	bool should_be_deleted(uint16_t player_id);
 	bool is_afk(uint16_t player_id);
 	void process();
-	world_player_add_s get_updated(uint16_t player_id, sampapi::CVector position);
 	world_player_add_s get(uint16_t player_id);
+	void update(uint16_t player_id);
 
 	std::set<uint16_t>::iterator begin();
 	std::set<uint16_t>::iterator end();
