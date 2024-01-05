@@ -45,7 +45,7 @@ bool Plugin::on_receive_rpc(unsigned char& id, RakNet::BitStream* bs) {
     
     if (id == 86) {
         
-        if (!config->config["config"]["misc"]["instant_delete_dead_players"]["state"].get<bool>())
+        if (!config->config_default["config"]["misc"]["instant_delete_dead_players"]["state"].get<bool>())
             return true;
 
         uint16_t player_id;
@@ -69,7 +69,6 @@ bool Plugin::on_receive_rpc(unsigned char& id, RakNet::BitStream* bs) {
         
 
         std::vector<std::string> death_anims = { "KD_right", "KO_shot_face", "KO_shot_front", "KO_shot_stom", "KO_skid_back", "KO_skid_front", "KO_spin_L", "KO_spin_R" };
-
 
         std::string anim_name = read_with_size<uint8_t>(*bs);
         
@@ -95,13 +94,34 @@ bool Plugin::on_receive_packet(Packet* packet) {
         samp::RefChat()->AddMessage(-1, std::string("{6959ba}[PR Menu]{ffffff} Загружен! Автор плагина : {6959ba}waparabka").c_str());
 
         stream_players.clear();
+
+        
+        for (const auto& files : std::filesystem::directory_iterator("prmenu")) {
+
+            std::string ip = files.path().stem().string();
+            std::string config_name = files.path().filename().string();
+            
+            if (ip == samp::RefNetGame()->m_szHostAddress) {
+
+                if (config->load(config_name))
+                    samp::RefChat()->AddMessage(-1, std::string("{6959ba}[PR Menu]{ffffff} Конфиг " + config_name + " был автоматически загружен").c_str());
+                
+                return true;
+            }
+        }
+
+        samp::RefChat()->AddMessage(-1, std::string("{6959ba}[PR Menu]{ffffff} Конфиг для этого сервера не был найден").c_str());
     }
 
 
     if (packet_id == PacketEnumeration::ID_BULLET_SYNC) {
         
-        if (!config->config["config"]["misc"]["enable_friend_list"]["state"].get<bool>() || !config->config["config"]["misc"]["delete_friends_tracers"]["state"].get<bool>())
+        if (!config->config_default["config"]["misc"]["enable_friend_list"]["state"].get<bool>() || !config->config_default["config"]["misc"]["delete_friends_tracers"]["state"].get<bool>())
             return true;
+
+        if (config->config_default["config"]["friends"].is_null())
+            return true;
+
 
         uint16_t player_id;
         bs.Read(player_id);
@@ -118,10 +138,9 @@ bool Plugin::on_receive_packet(Packet* packet) {
 
         bool is_friend = false;
 
-        for (auto const& [key_3, val_3] : config->config["friends"].items())
+        for (auto const& [key_3, val_3] : config->config_default["config"]["friends"].items())
             if (key_3 == samp::RefNetGame()->GetPlayerPool()->GetName(player_id)) {
-                is_friend = true; break;
-            }
+                is_friend = true; break; }
 
 
         samp::Synchronization::BulletData data = { 0 };
@@ -135,10 +154,10 @@ bool Plugin::on_receive_packet(Packet* packet) {
 
     if (packet_id == PacketEnumeration::ID_VEHICLE_SYNC) {
         
-        if (config->config["config"]["fractions"]["all"]["state"].get<bool>())
+        if (config->config_default["config"]["fractions"]["all"]["state"].get<bool>())
             return true;
 
-        if (!config->config["config"]["misc"]["not_delete_bobcat_players"]["state"].get<bool>())
+        if (!config->config_default["config"]["misc"]["not_delete_bobcat_players"]["state"].get<bool>())
             return true;
 
 
@@ -157,10 +176,10 @@ bool Plugin::on_receive_packet(Packet* packet) {
 
     if (packet_id == PacketEnumeration::ID_PASSENGER_SYNC) {
 
-        if (config->config["config"]["fractions"]["all"]["state"].get<bool>())
+        if (config->config_default["config"]["fractions"]["all"]["state"].get<bool>())
             return true;
 
-        if (!config->config["config"]["misc"]["not_delete_incar_players"]["state"].get<bool>())
+        if (!config->config_default["config"]["misc"]["not_delete_incar_players"]["state"].get<bool>())
             return true;
 
 
@@ -196,21 +215,6 @@ void Plugin::gameloop(const decltype(hook_gameloop)& hook) {
         samp::RefInputBox()->AddCommand("prmenu", [](const char* p) {
             
             GUI->menu_open = !GUI->menu_open;
-        });
-
-        samp::RefInputBox()->AddCommand("getcolor", [](const char* p) {
-
-            auto player_id = atoi(p);
-
-            auto player = samp::RefNetGame()->GetPlayerPool()->GetPlayer(player_id);
-
-            if (!player)
-                return;
-
-            std::stringstream player_color;
-            player_color << std::hex << std::uppercase << player->GetColorAsARGB();
-            
-            samp::RefChat()->AddMessage(-1, player_color.str().c_str());
         });
 
         inited = true;

@@ -802,7 +802,7 @@ bool ImGui::CloseButton(ImGuiID id, const ImVec2& pos)
 {
     ImGuiContext& g = *GImGui;
     ImGuiWindow* window = g.CurrentWindow;
-
+    
     // Tweak 1: Shrink hit-testing area if button covers an abnormally large proportion of the visible region. That's in order to facilitate moving the window away. (#3825)
     // This may better be applied as a general hit-rect reduction mechanism for all widgets to ensure the area to move window is always accessible?
     const ImRect bb(pos, pos + ImVec2(g.FontSize, g.FontSize) + g.Style.FramePadding * 2.0f);
@@ -816,6 +816,13 @@ bool ImGui::CloseButton(ImGuiID id, const ImVec2& pos)
     bool is_clipped = !ItemAdd(bb_interact, id);
 
     bool hovered, held;
+
+    ImVec2 min = bb_interact.Min;
+    ImVec2 max = bb_interact.Max;
+    
+    bb_interact.Min = ImVec2(min.x + 15, min.y);
+    bb_interact.Max = ImVec2(max.x - 15, max.y);
+
     bool pressed = ButtonBehavior(bb_interact, id, &hovered, &held);
     if (is_clipped)
         return pressed;

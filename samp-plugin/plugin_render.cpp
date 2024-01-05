@@ -102,7 +102,8 @@ std::optional<HRESULT> PluginRender::d3d9_present(const decltype(present_hook)& 
         ImGui::GetIO().MouseDrawCursor = false;
         ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 
-        D3DXCreateTextureFromFileInMemory(device, &logo, sizeof(logo), &GUI.texture);
+        D3DXCreateTextureFromFileInMemory(device, &logo, sizeof(logo), &GUI.texture_logo);
+        D3DXCreateTextureFromFileInMemory(device, &settings, sizeof(settings), &GUI.texture_settings);
 
 #pragma warning(push)
 #pragma warning(disable: 4996)

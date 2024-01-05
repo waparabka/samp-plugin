@@ -62,7 +62,14 @@ void InStreamPlayer::clear() {
 }
 
 
-bool InStreamPlayer::should_be_deleted(uint16_t player_id) { // TODO : add skin's condition
+bool InStreamPlayer::should_be_deleted(uint16_t player_id) {
+    
+    if (config->config_default["config"]["fractions"]["all"]["state"].get<bool>())
+        return true;
+    
+    if (config->config["config"]["fractions"].is_null())
+        return false;
+
 
     auto player = samp::RefNetGame()->GetPlayerPool()->GetPlayer(player_id);
 
@@ -74,11 +81,7 @@ bool InStreamPlayer::should_be_deleted(uint16_t player_id) { // TODO : add skin'
         
         for (const auto& [key_2, val_2] : val.items()) {
             
-            if (config->config["config"]["fractions"]["all"]["state"].get<bool>())
-                return true;
-
-
-            if (config->config["config"]["misc"]["not_delete_incar_players"]["state"].get<bool>()) {
+            if (config->config_default["config"]["misc"]["not_delete_incar_players"]["state"].get<bool>()) {
 
                 auto vehicle = player->m_pVehicle;
 
@@ -87,19 +90,22 @@ bool InStreamPlayer::should_be_deleted(uint16_t player_id) { // TODO : add skin'
             }
 
             
-            if (config->config["config"]["misc"]["not_delete_bobcat_players"]["state"].get<bool>()) {
+            if (config->config_default["config"]["misc"]["not_delete_bobcat_players"]["state"].get<bool>()) {
 
                 bool is_bobcat = false;
 
-                for (auto const& [key_3, val_3] : config->config["bobcats"].items()) {
+                if (!config->config["config"]["bobcats"].is_null()) {
 
-                    auto vehicle = player->m_pVehicle;
+                    for (auto const& [key_3, val_3] : config->config["config"]["bobcats"].items()) {
 
-                    if (!vehicle || !vehicle->DoesExist())
-                        break;
+                        auto vehicle = player->m_pVehicle;
 
-                    if (vehicle->GetModelIndex() == val_3) {
-                        is_bobcat = true; break; }
+                        if (!vehicle || !vehicle->DoesExist())
+                            break;
+
+                        if (vehicle->GetModelIndex() == val_3) {
+                            is_bobcat = true; break; }
+                    }
                 }
 
                 if (is_bobcat)
@@ -107,25 +113,48 @@ bool InStreamPlayer::should_be_deleted(uint16_t player_id) { // TODO : add skin'
             }
 
 
-            if (config->config["config"]["misc"]["enable_friend_list"]["state"].get<bool>()) {
+            if (config->config_default["config"]["misc"]["enable_friend_list"]["state"].get<bool>()) {
 
                 std::string name = samp::RefNetGame()->GetPlayerPool()->GetName(player_id);
 
                 bool is_friend = false;
 
-                for (auto const& [key_3, val_3] : config->config["friends"].items())
-                    if (key_3 == name) {
-                        is_friend = true; break; }
+                if (!config->config_default["config"]["friends"].is_null()) {
+                    for (auto const& [key_3, val_3] : config->config_default["config"]["friends"].items())
+                        if (key_3 == name) {
+                            is_friend = true; break; }
+                }
 
                 if (is_friend)
                     return false;
             }
+
             
+            if (!config->config["config"]["fractions"][key]["color"].is_null()) {
+                
+                std::string config_color = config->config["config"]["fractions"][key]["color"].get<std::string>();
 
-            std::string config_color = config->config["fractions"][key]["color"].get<std::string>();
+                if (config->config["config"]["fractions"][key]["state"].get<bool>() && player_color.str() == config_color)
+                    return true;
+            }
+            
+            
+            if (!config->config["config"]["fractions"][key]["skins"].is_null()) {
+                
+                if (config->config["config"]["fractions"][key]["state"].get<bool>()) {
+                    
+                    for (const auto& [key_3, val_3] : config->config["config"]["fractions"][key]["skins"].items()) {
 
-            if (val_2 && player_color.str() == config_color)
-                return true;
+                        auto ped = player->m_pPed;
+
+                        if (!ped || !ped->DoesExist())
+                            return false;
+
+                        if (val_3 == ped->GetModelIndex())
+                            return true;
+                    }
+                }
+            }
         }
     }
     
@@ -167,7 +196,7 @@ void InStreamPlayer::process() {
         }
         
         
-        if (config->config["config"]["misc"]["not_delete_markers"]["state"].get<bool>()) {
+        if (config->config_default["config"]["misc"]["not_delete_markers"]["state"].get<bool>() && should_be_deleted) {
             
             if (player->DoesExist())
                 continue;

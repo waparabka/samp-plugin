@@ -21,7 +21,15 @@ private:
 
 public:
 	json config;
+	json config_default;
+
+	std::string selected_item = "";
+	std::map<std::string, bool> items;
+
 	bool toggled = false;
+
+	bool load(std::string config_file);
+	void save(std::string config_file, json config);
 
 	Config();
 };
