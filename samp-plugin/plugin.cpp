@@ -105,15 +105,30 @@ bool Plugin::on_receive_packet(Packet* packet) {
 
         uint16_t player_id;
         bs.Read(player_id);
+
         
         if (!stream_players.is_contains(player_id))
             return true;
 
+
+        auto player = samp::RefNetGame()->GetPlayerPool()->GetPlayer(player_id);
+        
+        if (!player || !player->DoesExist() || player->GetColorAsARGB() != samp::RefNetGame()->GetPlayerPool()->GetLocalPlayer()->GetColorAsARGB())
+            return true;
+
+        bool is_friend = false;
+
+        for (auto const& [key_3, val_3] : config->config["friends"].items())
+            if (key_3 == samp::RefNetGame()->GetPlayerPool()->GetName(player_id)) {
+                is_friend = true; break;
+            }
+
+
         samp::Synchronization::BulletData data = { 0 };
 
         bs.Read((char*)&data, sizeof(samp::Synchronization::BulletData));
-
-        if (data.m_nTargetId == samp::RefNetGame()->GetPlayerPool()->m_localInfo.m_nId)
+        
+        if (is_friend && data.m_nTargetId == samp::RefNetGame()->GetPlayerPool()->m_localInfo.m_nId)
             return false;
     }
 
@@ -181,6 +196,21 @@ void Plugin::gameloop(const decltype(hook_gameloop)& hook) {
         samp::RefInputBox()->AddCommand("prmenu", [](const char* p) {
             
             GUI->menu_open = !GUI->menu_open;
+        });
+
+        samp::RefInputBox()->AddCommand("getcolor", [](const char* p) {
+
+            auto player_id = atoi(p);
+
+            auto player = samp::RefNetGame()->GetPlayerPool()->GetPlayer(player_id);
+
+            if (!player)
+                return;
+
+            std::stringstream player_color;
+            player_color << std::hex << std::uppercase << player->GetColorAsARGB();
+            
+            samp::RefChat()->AddMessage(-1, player_color.str().c_str());
         });
 
         inited = true;
