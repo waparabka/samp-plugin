@@ -7,7 +7,6 @@
 #include <sampapi/CChat.h>
 #include <sampapi/CInput.h>
 #include <sampapi/CNetGame.h>
-#include <sampapi/Synchronization.h>
 
 namespace samp = sampapi::v037r1;
 
