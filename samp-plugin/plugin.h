@@ -4,9 +4,12 @@
 #include <RakHook/rakhook.hpp>
 #include <RakNet/BitStream.h>
 #include <RakNet/PacketEnumerations.h>
-#include "plugin_render.h"
-#include "in_stream_player.h"
-#include "config.h"
+#include <sampapi/CChat.h>
+#include <sampapi/CInput.h>
+#include <sampapi/CNetGame.h>
+#include <sampapi/Synchronization.h>
+
+namespace samp = sampapi::v037r1;
 
 using gameloop_t = void(__cdecl*)();
 
@@ -19,14 +22,10 @@ public:
 
 private:
 	bool inited;
-	PluginRender render;
-	Config* config = Config::Get();
-	InStreamPlayer stream_players;
 	
 	kthook::kthook_simple<gameloop_t> hook_gameloop { reinterpret_cast<void*>(0x561B10) };
 	void gameloop(const decltype(hook_gameloop)& hook);
 	
-
 	template <typename T>
 	std::string read_with_size(RakNet::BitStream& bs) {
 		T size;
@@ -42,7 +41,4 @@ private:
 		bs.Write(size);
 		bs.Write(str.data(), size);
 	}
-
-	bool on_receive_rpc(unsigned char& id, RakNet::BitStream* bs);
-	bool on_receive_packet(Packet* packet);
 };
