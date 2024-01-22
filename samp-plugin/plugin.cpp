@@ -15,11 +15,9 @@ void Plugin::gameloop(const decltype(hook_gameloop)& hook) {
     static bool inited = false;
     
     if (!inited && samp::RefChat() != nullptr && rakhook::initialize()) {
-        
-        using namespace std::placeholders;
-        
-        
 
+        // do smth..
+        
         inited = true;
     }
 
