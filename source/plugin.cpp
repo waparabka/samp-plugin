@@ -1,14 +1,5 @@
 #include "plugin.hpp"
 
-using namespace std::placeholders;
-
-
-c_plugin::c_plugin() {
-
-    update_hook.set_cb(std::bind(&c_plugin::update, this, _1));
-    update_hook.install();
-}
-
 
 void c_plugin::update(const decltype(update_hook)& hook) {
 
@@ -21,12 +12,4 @@ void c_plugin::update(const decltype(update_hook)& hook) {
         initialized = true;
     }
     return hook.call_trampoline();
-}
-
-
-c_plugin::~c_plugin() {
-
-    update_hook.remove();
-
-    rakhook::destroy();
 }
