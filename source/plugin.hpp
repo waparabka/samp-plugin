@@ -8,14 +8,16 @@
 
 #include "samp.hpp"
 
+using namespace std::placeholders;
+
 
 class c_plugin {
 
 public:
-	c_plugin();
-	~c_plugin();
+	c_plugin() = default;
+	~c_plugin() { rakhook::destroy(); };
 	
-	kthook::kthook_simple<void(__cdecl*)()> update_hook { reinterpret_cast<void*>(0x561B10) };
+	kthook::kthook_simple<void(__cdecl*)()> update_hook { reinterpret_cast<void*>(0x561B10), std::bind(&c_plugin::update, this, _1) };
 	void update(const decltype(update_hook)& hook);
 };
 
